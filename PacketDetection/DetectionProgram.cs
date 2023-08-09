@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using FFXIVOpcodeWizard.Models;
 using Machina.FFXIV;
@@ -63,7 +65,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
             for (; state.ScannerIndex < scanners.Count; state.ScannerIndex++)
             {
                 var scanner = scanners[state.ScannerIndex];
-                
+
                 var parameters = new string[scanner.ParameterPrompts.Length];
 
                 scanner.Opcode = 0;
@@ -88,7 +90,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
                 scanner.Running = false;
 
-                if (this.stopped) return this.aborted;
+                if (this.stopped)
+                    return this.aborted;
             }
 
             return this.aborted;
@@ -162,7 +165,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
             GetWindowThreadProcessId(window, out var pid);
             var proc = Process.GetProcessById(Convert.ToInt32(pid));
             var gamePath = proc.MainModule?.FileName;
-            
+
             var monitor = new FFXIVNetworkMonitor
             {
                 MessageReceivedEventHandler = OnMessageReceived,
@@ -170,7 +173,16 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 MonitorType = args.CaptureMode,
                 WindowName = args.Region == Region.China ? "最终幻想XIV" : "FINAL FANTASY XIV",
             };
-            
+
+            // FIXME: add toggle button
+            monitor.UseDeucalion = true;
+            if (monitor.UseDeucalion)
+            {
+                int? id = (Process.GetProcessesByName("ffxiv_dx11").FirstOrDefault()?.Id) ??
+                    throw new ThreadStateException("No ffxiv_dx11.exe process was found, please ensure that the DirectX 11 version of the game is running and try again.");
+                monitor.ProcessID = (uint)id;
+            }
+
             if (!string.IsNullOrEmpty(gamePath))
             {
                 monitor.OodlePath = gamePath;
@@ -203,7 +215,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
         private void OnMessage(string connection, long epoch, byte[] data, PacketSource source)
         {
-            lock(this.pq)
+            lock (this.pq)
             {
                 this.pq.Enqueue(new Packet
                 {
@@ -214,7 +226,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 });
             }
         }
-        
+
         private static void RequestParameters(Scanner scanner, IList<string> parameters, Func<Scanner, int, (string parameter, bool skipRequested)> requestParameter, ref bool skip)
         {
             for (var paramIndex = 0; paramIndex < parameters.Count; paramIndex++)
@@ -228,11 +240,11 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 parameters[paramIndex] = parameter ?? "";
             }
         }
-        
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-        
-        [DllImport("user32.dll", SetLastError=true)]
+
+        [DllImport("user32.dll", SetLastError = true)]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
     }
 }
