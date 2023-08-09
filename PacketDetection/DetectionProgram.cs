@@ -1,13 +1,13 @@
-﻿using System;
+﻿using FFXIVOpcodeWizard.Models;
+using Machina.FFXIV;
+using Machina.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using FFXIVOpcodeWizard.Models;
-using Machina.FFXIV;
-using Machina.Infrastructure;
 
 namespace FFXIVOpcodeWizard.PacketDetection
 {
@@ -19,6 +19,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
             public Region Region { get; set; }
             public NetworkMonitorType CaptureMode { get; set; }
+            public bool UseDeucalion { get; set; }
         }
 
         public class State
@@ -174,8 +175,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 WindowName = args.Region == Region.China ? "最终幻想XIV" : "FINAL FANTASY XIV",
             };
 
-            // FIXME: add toggle button
-            monitor.UseDeucalion = true;
+            monitor.UseDeucalion = args.UseDeucalion;
             if (monitor.UseDeucalion)
             {
                 int? id = (Process.GetProcessesByName("ffxiv_dx11").FirstOrDefault()?.Id) ??

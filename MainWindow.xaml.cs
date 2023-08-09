@@ -49,6 +49,7 @@ namespace FFXIVOpcodeWizard
                 CaptureMode = this.captureModeSelectorViewModel.SelectedCaptureMode,
                 Region = this.regionSelectorViewModel.SelectedRegion,
                 Registry = this.scannerRegistry,
+                UseDeucalion = checkBoxUseDeucalion.IsChecked.Value,
             };
         }
 

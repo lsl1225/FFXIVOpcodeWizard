@@ -88,6 +88,7 @@
             <views:RegionSelector x:Name="RegionSelector" Loaded="RegionSelector_Loaded" Margin="5" Grid.Row="1" />
             <views:CaptureModeSelector x:Name="CaptureModeSelector" Loaded="CaptureModeSelector_Loaded" Margin="5" Grid.Row="1" Grid.Column="1" />
             <views:NumberFormatSelector x:Name="NumberFormatSelector" Loaded="NumberFormatSelector_Loaded" Margin="5" Grid.Row="1" Grid.Column="2" />
+            <CheckBox x:Name="checkBoxUseDeucalion" IsChecked="False" Grid.Column="1" Content="Deucalion" HorizontalAlignment="Left" Margin="15,90,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         </Grid>
     </DockPanel>
 </adonisControls:AdonisWindow>
