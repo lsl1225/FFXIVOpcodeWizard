@@ -37,7 +37,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 {
                     maxHp = int.Parse(parameters[0]);
 
-                    if (packet.PacketSize != 40 && packet.PacketSize != 48) return false;
+                    if (packet.PacketSize != 40 && packet.PacketSize != 48)
+                        return false;
 
                     var packetHp = BitConverter.ToUInt32(packet.Data, Offsets.IpcData);
                     var packetMp = BitConverter.ToUInt16(packet.Data, Offsets.IpcData + 4);
@@ -101,7 +102,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 PacketSource.Server,
                 (packet, parameters) =>
                 {
-                    if (packet.PacketSize != 40 || packet.SourceActor != packet.TargetActor) return false;
+                    if (packet.PacketSize != 40 || packet.SourceActor != packet.TargetActor)
+                        return false;
 
                     var playtime = BitConverter.ToUInt32(packet.Data, (int)Offsets.IpcData);
 
@@ -137,7 +139,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 PacketSource.Server,
                 (packet, parameters) =>
                 {
-                    if (lightningCrystals == -1) lightningCrystals = int.Parse(parameters[0]);
+                    if (lightningCrystals == -1)
+                        lightningCrystals = int.Parse(parameters[0]);
                     return packet.PacketSize == 64 &&
                            BitConverter.ToUInt16(packet.Data, Offsets.IpcData) == 5;
                 },
@@ -167,7 +170,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 PacketSource.Server,
                 (packet, _) =>
                 {
-                    if (packet.PacketSize != 48) return false;
+                    if (packet.PacketSize != 48)
+                        return false;
 
                     var x = (float)BitConverter.ToUInt16(packet.Data, Offsets.IpcData + 6) / 65536 * 2000 - 1000;
                     var y = (float)BitConverter.ToUInt16(packet.Data, Offsets.IpcData + 8) / 65536 * 2000 - 1000;
@@ -192,7 +196,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 PacketSource.Server,
                 (packet, _) =>
                 {
-                    if (packet.PacketSize != 56) return false;
+                    if (packet.PacketSize != 56)
+                        return false;
 
                     var x = BitConverter.ToSingle(packet.Data, Offsets.IpcData + 8);
                     var y = BitConverter.ToSingle(packet.Data, Offsets.IpcData + 12);
@@ -212,7 +217,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 PacketSource.Server,
                 (packet, _) =>
                 {
-                    if (packet.PacketSize != 48) return false;
+                    if (packet.PacketSize != 48)
+                        return false;
 
                     var logMessage = BitConverter.ToUInt32(packet.Data, Offsets.IpcData);
                     var targetZone = BitConverter.ToUInt16(packet.Data, Offsets.IpcData + 4);
@@ -247,11 +253,13 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 PacketSource.Server,
                 (packet, _) =>
                 {
-                    if (packet.PacketSize != 136 || packet.SourceActor != packet.TargetActor) return false;
+                    if (packet.PacketSize != 136 || packet.SourceActor != packet.TargetActor)
+                        return false;
 
                     for (var i = 0; i < 24; i++)
                     {
-                        if (BitConverter.ToUInt32(packet.Data, Offsets.IpcData + 0x04 + 4 * i) != 0) return false;
+                        if (BitConverter.ToUInt32(packet.Data, Offsets.IpcData + 0x04 + 4 * i) != 0)
+                            return false;
                     }
 
                     return true;
@@ -265,7 +273,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                                BitConverter.ToUInt32(packet.Data, Offsets.IpcData + 12) ==
                                BitConverter.ToUInt32(packet.Data, Offsets.IpcData + 16) &&
                                BitConverter.ToUInt16(packet.Data, Offsets.IpcData + 0x1E) == 761
-                ); ;
+                );
+            ;
             //=================
             RegisterScanner("EventStart", "Please begin fishing and put your rod away immediately.",
                 PacketSource.Server,
@@ -315,7 +324,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 PacketSource.Server,
                 (packet, _) =>
                 {
-                    if (packet.PacketSize != 208) return false;
+                    if (packet.PacketSize != 208)
+                        return false;
 
                     for (var i = 0; i < 22; ++i)
                     {
@@ -366,7 +376,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 (packet, _, comment) =>
                 {
                     var match = packet.PacketSize == 80 && BitConverter.ToUInt16(packet.Data, Offsets.IpcData + 0x18) == scannerItemId;
-                    if (!match) return false;
+                    if (!match)
+                        return false;
 
                     inventoryModifyHandlerId = BitConverter.ToUInt32(packet.Data, Offsets.IpcData);
 
@@ -382,7 +393,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 (packet, _) =>
                 {
                     var match = packet.PacketSize == 80 && BitConverter.ToUInt16(packet.Data, Offsets.IpcData + 0x18) == scannerItemId;
-                    if (!match) return false;
+                    if (!match)
+                        return false;
 
                     inventoryModifyHandlerId = BitConverter.ToUInt32(packet.Data, Offsets.IpcData);
                     return true;
@@ -551,12 +563,13 @@ namespace FFXIVOpcodeWizard.PacketDetection
             //=================
             RegisterScanner("IslandWorkshopSupplyDemand", "Go to your Island Sanctuary and check workshop supply/demand status",
                 PacketSource.Server,
-                (packet, parameters) => packet.PacketSize == 116 && BitConverter.ToUInt32(packet.Data, Offsets.IpcData) == 0 && BitConverter.ToUInt32(packet.Data, Offsets.IpcData +1) == 0);
+                (packet, parameters) => packet.PacketSize == 116 && BitConverter.ToUInt32(packet.Data, Offsets.IpcData) == 0 && BitConverter.ToUInt32(packet.Data, Offsets.IpcData + 1) == 0);
             RegisterScanner("MiniCactpotInit", "Start playing Mini Cactpot.",
                 PacketSource.Server,
                 (packet, _) =>
                 {
-                    if (packet.Data.Length != Offsets.IpcData + 136) return false;
+                    if (packet.Data.Length != Offsets.IpcData + 136)
+                        return false;
 
                     var indexEnd = packet.Data[Offsets.IpcData + 7];
                     var column = BitConverter.ToUInt32(packet.Data, Offsets.IpcData + 12);
@@ -571,11 +584,14 @@ namespace FFXIVOpcodeWizard.PacketDetection
             //=================
             RegisterScanner("SocialList", "Open your Party List.",
                 PacketSource.Server,
-                (packet, parameters) => 
+                (packet, parameters) =>
                 {
-                    if (packet.Data.Length != Offsets.IpcData + 896) return false;
-                    if (packet.Data[Offsets.IpcData + 13 - 1] != 1) return false;
-                    if (!IncludesBytes(packet.Data, Encoding.UTF8.GetBytes(parameters[0]))) return false;
+                    if (packet.Data.Length != Offsets.IpcData + 896)
+                        return false;
+                    if (packet.Data[Offsets.IpcData + 13 - 1] != 1)
+                        return false;
+                    if (!IncludesBytes(packet.Data, Encoding.UTF8.GetBytes(parameters[0])))
+                        return false;
                     return true;
                 },
                 new[] { "Please enter your character name:" });
@@ -620,7 +636,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
         private static bool IncludesBytes(byte[] source, byte[] search)
         {
-            if (search == null) return false;
+            if (search == null)
+                return false;
 
             for (var i = 0; i < source.Length - search.Length; ++i)
             {

@@ -1,6 +1,6 @@
-﻿using System;
-using FFXIVOpcodeWizard.Models;
+﻿using FFXIVOpcodeWizard.Models;
 using FFXIVOpcodeWizard.PacketDetection;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -18,7 +18,8 @@ namespace FFXIVOpcodeWizard.ViewModels
             get => this.selectedScanner;
             set
             {
-                if (this.selectedScanner == value) return;
+                if (this.selectedScanner == value)
+                    return;
                 this.selectedScanner = value;
                 OnPropertyChanged();
             }

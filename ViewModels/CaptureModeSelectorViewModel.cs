@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FFXIVOpcodeWizard.Models;
+using Machina.Infrastructure;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using FFXIVOpcodeWizard.Models;
-using Machina.Infrastructure;
 
 namespace FFXIVOpcodeWizard.ViewModels
 {

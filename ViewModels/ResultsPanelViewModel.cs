@@ -51,7 +51,8 @@ namespace FFXIVOpcodeWizard.ViewModels
 
             foreach (var scanner in this.registry.AsList())
             {
-                if (scanner.Opcode == 0) continue;
+                if (scanner.Opcode == 0)
+                    continue;
 
                 var sb = scanner.PacketSource == PacketSource.Client ? clientSb : serverSb;
 
