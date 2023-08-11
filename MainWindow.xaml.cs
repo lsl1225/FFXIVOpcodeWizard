@@ -59,6 +59,7 @@ namespace FFXIVOpcodeWizard
 
             RunButton.IsEnabled = false;
             StopButton.IsEnabled = true;
+            checkBoxUseDeucalion.IsEnabled = false;
 
             this.detectionProgram = new DetectionProgram();
             var aborted = await detectionProgram.Run(
@@ -72,6 +73,7 @@ namespace FFXIVOpcodeWizard
                 RunButton.IsEnabled = true;
                 StopButton.IsEnabled = false;
                 SkipButton.IsEnabled = false;
+                checkBoxUseDeucalion.IsEnabled = true;
             }
         }
 
@@ -81,6 +83,7 @@ namespace FFXIVOpcodeWizard
 
             RunButton.IsEnabled = false;
             StopButton.IsEnabled = true;
+            checkBoxUseDeucalion.IsEnabled = false;
 
             this.detectionProgram = new DetectionProgram();
             var aborted = await this.detectionProgram.RunOne(
@@ -94,6 +97,7 @@ namespace FFXIVOpcodeWizard
                 RunButton.IsEnabled = true;
                 StopButton.IsEnabled = false;
                 SkipButton.IsEnabled = false;
+                checkBoxUseDeucalion.IsEnabled = true;
             }
         }
 
@@ -159,6 +163,7 @@ namespace FFXIVOpcodeWizard
             RunButton.IsEnabled = true;
             StopButton.IsEnabled = false;
             SkipButton.IsEnabled = false;
+            checkBoxUseDeucalion.IsEnabled = true;
 
             this.detectionProgram.Stop();
 
