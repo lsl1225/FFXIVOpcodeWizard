@@ -1,4 +1,5 @@
-﻿using FFXIVOpcodeWizard.Models;
+﻿using AdonisUI.Controls;
+using FFXIVOpcodeWizard.Models;
 using Machina.FFXIV;
 using Machina.Infrastructure;
 using System;
@@ -59,7 +60,14 @@ namespace FFXIVOpcodeWizard.PacketDetection
             };
 
             var monitor = BuildNetworkMonitor(args);
-            monitor.Start();
+            if (monitor != null)
+            {
+                monitor.Start();
+            }
+            else
+            {
+                return false;
+            }
 
             var scanners = args.Registry.AsList();
 
@@ -111,7 +119,14 @@ namespace FFXIVOpcodeWizard.PacketDetection
             var state = new State();
 
             var monitor = BuildNetworkMonitor(args);
-            monitor.Start();
+            if (monitor != null)
+            {
+                monitor.Start();
+            }
+            else
+            {
+                return false;
+            }
 
             var parameters = new string[scanner.ParameterPrompts.Length];
 
@@ -162,33 +177,42 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
         private FFXIVNetworkMonitor BuildNetworkMonitor(Args args)
         {
-            var window = FindWindow("FFXIVGAME", null);
-            GetWindowThreadProcessId(window, out var pid);
-            var proc = Process.GetProcessById(Convert.ToInt32(pid));
-            var gamePath = proc.MainModule?.FileName;
-
-            var monitor = new FFXIVNetworkMonitor
+            try
             {
-                MessageReceivedEventHandler = OnMessageReceived,
-                MessageSentEventHandler = OnMessageSent,
-                MonitorType = args.CaptureMode,
-                WindowName = args.Region == Region.China ? "最终幻想XIV" : "FINAL FANTASY XIV",
-            };
+                var window = FindWindow("FFXIVGAME", null);
+                GetWindowThreadProcessId(window, out var pid);
+                var proc = Process.GetProcessById(Convert.ToInt32(pid));
+                var gamePath = proc.MainModule?.FileName;
 
-            monitor.UseDeucalion = args.UseDeucalion;
-            if (monitor.UseDeucalion)
-            {
-                int? id = (Process.GetProcessesByName("ffxiv_dx11").FirstOrDefault()?.Id) ??
-                    throw new ThreadStateException("No ffxiv_dx11.exe process was found, please ensure that the DirectX 11 version of the game is running and try again.");
-                monitor.ProcessID = (uint)id;
+                var monitor = new FFXIVNetworkMonitor
+                {
+                    MessageReceivedEventHandler = OnMessageReceived,
+                    MessageSentEventHandler = OnMessageSent,
+                    MonitorType = args.CaptureMode,
+                    WindowName = args.Region == Region.China ? "最终幻想XIV" : "FINAL FANTASY XIV",
+                };
+
+                monitor.UseDeucalion = args.UseDeucalion;
+                if (monitor.UseDeucalion)
+                {
+                    int? id = (Process.GetProcessesByName("ffxiv_dx11").FirstOrDefault()?.Id) ??
+                        throw new ThreadStateException();
+                    monitor.ProcessID = (uint)id;
+                }
+
+                if (!string.IsNullOrEmpty(gamePath))
+                {
+                    monitor.OodlePath = gamePath;
+                }
+
+                return monitor;
             }
-
-            if (!string.IsNullOrEmpty(gamePath))
+            catch (Exception)
             {
-                monitor.OodlePath = gamePath;
+                string errorText = "No ffxiv_dx11.exe process was found, please ensure that the DirectX 11 version of the game is running and try again.";
+                MessageBox.Show(errorText, null, MessageBoxButton.OK);
+                return null;
             }
-
-            return monitor;
         }
 
         private Task RunScanner(Scanner scanner, string[] parameters)
