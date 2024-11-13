@@ -353,6 +353,10 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 PacketSource.Server,
                 (packet, _) => packet.PacketSize == 48 &&
                                isDarkMatter(BitConverter.ToUInt32(packet.Data, Offsets.IpcData)));
+            RegisterScanner("MarketBoardRequestItemListingInfo", "Please open the market board listings for any Dark Matter.",
+                PacketSource.Client,
+                (packet, _) => packet.PacketSize == 40 &&
+                               isDarkMatter(BitConverter.ToUInt32(packet.Data, Offsets.IpcData)));
             //=================
             const uint scannerItemId = 4850; // Honey
             RegisterScanner("UpdateInventorySlot", "Please purchase a Honey from Tradecraft Supplier (2 gil).",
