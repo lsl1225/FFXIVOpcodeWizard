@@ -583,6 +583,15 @@ namespace FFXIVOpcodeWizard.PacketDetection
                     return true;
                 },
                 new[] { "Please enter your character name:" });
+            //=================
+            RegisterScanner("WorldVisitQueue", "Please move to a new world and wait until land.",
+                PacketSource.Server,
+                (packet, _) =>
+                {
+                    byte[] predefinedArray = new byte[] { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    return packet.PacketSize == (Offsets.IpcData + 16) &&
+                              packet.Data.Skip(Offsets.IpcData).ToArray().SequenceEqual(predefinedArray);
+                });
         }
 
         /// <summary>
