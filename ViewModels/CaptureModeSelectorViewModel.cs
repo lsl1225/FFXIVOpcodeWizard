@@ -25,7 +25,7 @@ namespace FFXIVOpcodeWizard.ViewModels
             var selection = CaptureModes.First(cm => cm.IsChecked).Text;
             return selection switch
             {
-                "Sockets" => NetworkMonitorType.RawSocket,
+                "Sockets (deucalion)" => NetworkMonitorType.RawSocket,
                 _ => throw new NotImplementedException(),
             };
         }
