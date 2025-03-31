@@ -16,8 +16,7 @@ namespace FFXIVOpcodeWizard.ViewModels
         {
             CaptureModes = new ObservableCollection<RadioItem>
             {
-                new RadioItem { Text = "WinPCap", IsChecked = true },
-                new RadioItem { Text = "Sockets", IsEnabled = Util.Elevated(), Tooltip = "Requires Administrator privileges" },
+                new RadioItem { Text = "Sockets (deucalion)", IsChecked = Util.Elevated(), IsEnabled = Util.Elevated(), Tooltip = "Requires Administrator privileges" },
             };
         }
 
@@ -26,7 +25,6 @@ namespace FFXIVOpcodeWizard.ViewModels
             var selection = CaptureModes.First(cm => cm.IsChecked).Text;
             return selection switch
             {
-                "WinPCap" => NetworkMonitorType.WinPCap,
                 "Sockets" => NetworkMonitorType.RawSocket,
                 _ => throw new NotImplementedException(),
             };
