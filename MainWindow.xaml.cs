@@ -204,11 +204,6 @@ namespace FFXIVOpcodeWizard
             RegionSelector.DataContext = this.regionSelectorViewModel;
         }
 
-        private void CaptureModeSelector_Loaded(object sender, RoutedEventArgs e)
-        {
-            CaptureModeSelector.DataContext = this.captureModeSelectorViewModel;
-        }
-
         private void NumberFormatSelector_Loaded(object sender, RoutedEventArgs e)
         {
             this.numberFormatSelectorViewModel.PropertyChanged += NumberFormatSelectorViewModel_PropertyChanged;

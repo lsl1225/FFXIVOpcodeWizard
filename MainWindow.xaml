@@ -86,8 +86,7 @@
                 </DockPanel>
             </StackPanel>
             <views:RegionSelector x:Name="RegionSelector" Loaded="RegionSelector_Loaded" Margin="5" Grid.Row="1" />
-            <views:CaptureModeSelector x:Name="CaptureModeSelector" Loaded="CaptureModeSelector_Loaded" Margin="5" Grid.Row="1" Grid.Column="1" />
-            <views:NumberFormatSelector x:Name="NumberFormatSelector" Loaded="NumberFormatSelector_Loaded" Margin="5" Grid.Row="1" Grid.Column="2" />
+            <views:NumberFormatSelector x:Name="NumberFormatSelector" Loaded="NumberFormatSelector_Loaded" Margin="5" Grid.Row="1" Grid.Column="1" />
         </Grid>
     </DockPanel>
 </adonisControls:AdonisWindow>

@@ -31,6 +31,8 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
         private Queue<Packet> pq;
 
+        private FFXIVNetworkMonitor monitor = null;
+
         /// <summary>
         /// Runs the detection program.
         /// </summary>
@@ -55,15 +57,18 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 ScannerIndex = skipCount,
             };
 
-            var monitor = BuildNetworkMonitor(args);
-            monitor.Start();
+            if (monitor == null)
+            {
+                monitor = BuildNetworkMonitor(args);
+                monitor.Start();
+            }
 
             var scanners = args.Registry.AsList();
 
             for (; state.ScannerIndex < scanners.Count; state.ScannerIndex++)
             {
                 var scanner = scanners[state.ScannerIndex];
-                
+
                 var parameters = new string[scanner.ParameterPrompts.Length];
 
                 scanner.Opcode = 0;
@@ -81,7 +86,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
                     {
                         scanner.Running = false;
                         continue;
-                    };
+                    }
                 }
 
                 await RunScanner(scanner, parameters);
@@ -106,8 +111,11 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
             var state = new State();
 
-            var monitor = BuildNetworkMonitor(args);
-            monitor.Start();
+            if (monitor == null)
+            {
+                monitor = BuildNetworkMonitor(args);
+                monitor.Start();
+            }
 
             var parameters = new string[scanner.ParameterPrompts.Length];
 
@@ -126,7 +134,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 {
                     scanner.Running = false;
                     return this.aborted;
-                };
+                }
             }
 
             await RunScanner(scanner, parameters);
@@ -147,6 +155,14 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
         public void Stop()
         {
+            // 停止网络检测
+            if (monitor != null)
+            {
+                monitor?.Stop();
+                monitor.Dispose();
+                monitor = null;
+            }
+
             this.stopped = true;
             Skip();
         }
@@ -162,18 +178,18 @@ namespace FFXIVOpcodeWizard.PacketDetection
             GetWindowThreadProcessId(window, out var pid);
             var proc = Process.GetProcessById(Convert.ToInt32(pid));
             var gamePath = proc.MainModule?.FileName;
-            
+
             var monitor = new FFXIVNetworkMonitor
             {
                 MessageReceivedEventHandler = OnMessageReceived,
                 MessageSentEventHandler = OnMessageSent,
-                MonitorType = args.CaptureMode,
+                MonitorType = NetworkMonitorType.RawSocket,
                 WindowName = args.Region == Region.China ? "最终幻想XIV" : "FINAL FANTASY XIV",
                 OodleImplementation = args.Region == Region.Korea ? Machina.FFXIV.Oodle.OodleImplementation.KoreanFfxivUdp : Machina.FFXIV.Oodle.OodleImplementation.FfxivTcp,
-                UseDeucalion = args.CaptureMode == NetworkMonitorType.RawSocket,
+                UseDeucalion = true,
                 ProcessID = pid,
             };
-            
+
             if (!string.IsNullOrEmpty(gamePath))
             {
                 monitor.OodlePath = gamePath;
@@ -206,7 +222,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
         private void OnMessage(string connection, long epoch, byte[] data, PacketSource source)
         {
-            lock(this.pq)
+            lock (this.pq)
             {
                 this.pq.Enqueue(new Packet
                 {
@@ -217,7 +233,7 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 });
             }
         }
-        
+
         private static void RequestParameters(Scanner scanner, IList<string> parameters, Func<Scanner, int, (string parameter, bool skipRequested)> requestParameter, ref bool skip)
         {
             for (var paramIndex = 0; paramIndex < parameters.Count; paramIndex++)
@@ -231,11 +247,11 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 parameters[paramIndex] = parameter ?? "";
             }
         }
-        
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-        
-        [DllImport("user32.dll", SetLastError=true)]
+
+        [DllImport("user32.dll", SetLastError = true)]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
     }
 }
