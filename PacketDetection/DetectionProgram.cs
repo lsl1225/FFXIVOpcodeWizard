@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using AdonisUI.Controls;
 using FFXIVOpcodeWizard.Models;
 using Machina.FFXIV;
 using Machina.Infrastructure;
@@ -11,6 +12,15 @@ namespace FFXIVOpcodeWizard.PacketDetection
 {
     public class DetectionProgram
     {
+
+        public class GameNotFoundException : Exception
+        {
+            public GameNotFoundException() : base("Cannot find game window.")
+            {
+                MessageBox.Show(this.Message, null, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         public class Args
         {
             public ScannerRegistry Registry { get; set; }
@@ -57,43 +67,50 @@ namespace FFXIVOpcodeWizard.PacketDetection
                 ScannerIndex = skipCount,
             };
 
-            if (monitor == null)
+            try
             {
-                monitor = BuildNetworkMonitor(args);
-                monitor.Start();
-            }
-
-            var scanners = args.Registry.AsList();
-
-            for (; state.ScannerIndex < scanners.Count; state.ScannerIndex++)
-            {
-                var scanner = scanners[state.ScannerIndex];
-
-                var parameters = new string[scanner.ParameterPrompts.Length];
-
-                scanner.Opcode = 0;
-                scanner.Running = true;
-                state.CurrentTutorial = scanner.Tutorial;
-
-                onStateChanged(state);
-
-                if (parameters.Length > 0)
+                if (monitor == null)
                 {
-                    var skip = false;
-                    RequestParameters(scanner, parameters, requestParameter, ref skip);
-
-                    if (skip)
-                    {
-                        scanner.Running = false;
-                        continue;
-                    }
+                    monitor = BuildNetworkMonitor(args);
+                    monitor.Start();
                 }
 
-                await RunScanner(scanner, parameters);
+                var scanners = args.Registry.AsList();
 
-                scanner.Running = false;
+                for (; state.ScannerIndex < scanners.Count; state.ScannerIndex++)
+                {
+                    var scanner = scanners[state.ScannerIndex];
 
-                if (this.stopped) return this.aborted;
+                    var parameters = new string[scanner.ParameterPrompts.Length];
+
+                    scanner.Opcode = 0;
+                    scanner.Running = true;
+                    state.CurrentTutorial = scanner.Tutorial;
+
+                    onStateChanged(state);
+
+                    if (parameters.Length > 0)
+                    {
+                        var skip = false;
+                        RequestParameters(scanner, parameters, requestParameter, ref skip);
+
+                        if (skip)
+                        {
+                            scanner.Running = false;
+                            continue;
+                        }
+                    }
+
+                    await RunScanner(scanner, parameters);
+
+                    scanner.Running = false;
+
+                    if (this.stopped) return this.aborted;
+                }
+            }
+            catch (Exception)
+            {
+                Stop();
             }
 
             return this.aborted;
@@ -111,37 +128,44 @@ namespace FFXIVOpcodeWizard.PacketDetection
 
             var state = new State();
 
-            if (monitor == null)
+            try
             {
-                monitor = BuildNetworkMonitor(args);
-                monitor.Start();
-            }
-
-            var parameters = new string[scanner.ParameterPrompts.Length];
-
-            scanner.Opcode = 0;
-            scanner.Running = true;
-            state.CurrentTutorial = scanner.Tutorial;
-
-            onStateChanged(state);
-
-            if (parameters.Length > 0)
-            {
-                var skip = false;
-                RequestParameters(scanner, parameters, requestParameter, ref skip);
-
-                if (skip)
+                if (monitor == null)
                 {
-                    scanner.Running = false;
-                    return this.aborted;
+                    monitor = BuildNetworkMonitor(args);
+                    monitor.Start();
                 }
+
+                var parameters = new string[scanner.ParameterPrompts.Length];
+
+                scanner.Opcode = 0;
+                scanner.Running = true;
+                state.CurrentTutorial = scanner.Tutorial;
+
+                onStateChanged(state);
+
+                if (parameters.Length > 0)
+                {
+                    var skip = false;
+                    RequestParameters(scanner, parameters, requestParameter, ref skip);
+
+                    if (skip)
+                    {
+                        scanner.Running = false;
+                        return this.aborted;
+                    }
+                }
+
+                await RunScanner(scanner, parameters);
+
+                onStateChanged(state);
+
+                scanner.Running = false;
             }
-
-            await RunScanner(scanner, parameters);
-
-            onStateChanged(state);
-
-            scanner.Running = false;
+            catch (Exception)
+            {
+                Stop();
+            }
 
             return this.aborted;
         }
@@ -175,7 +199,12 @@ namespace FFXIVOpcodeWizard.PacketDetection
         private FFXIVNetworkMonitor BuildNetworkMonitor(Args args)
         {
             var window = FindWindow("FFXIVGAME", null);
-            GetWindowThreadProcessId(window, out var pid);
+            var wndHandle = GetWindowThreadProcessId(window, out var pid);
+            if (wndHandle == 0)
+            {
+                throw new GameNotFoundException();
+            }
+
             var proc = Process.GetProcessById(Convert.ToInt32(pid));
             var gamePath = proc.MainModule?.FileName;
 
