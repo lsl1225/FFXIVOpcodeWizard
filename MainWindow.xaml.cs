@@ -1,6 +1,7 @@
 ﻿using FFXIVOpcodeWizard.Models;
 using FFXIVOpcodeWizard.PacketDetection;
 using FFXIVOpcodeWizard.ViewModels;
+using Machina.Infrastructure;
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace FFXIVOpcodeWizard
         {
             return new DetectionProgram.Args
             {
-                CaptureMode = this.captureModeSelectorViewModel.SelectedCaptureMode,
+                CaptureMode = NetworkMonitorType.RawSocket,
                 Region = this.regionSelectorViewModel.SelectedRegion,
                 Registry = this.scannerRegistry,
             };
